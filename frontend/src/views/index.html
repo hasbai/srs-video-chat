@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script type="text/javascript" src="js/adapter-7.4.0.min.js"></script>
+    <script type="text/javascript" src="js/srs.sdk.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/index.css"><link>
+</head>
+<body>
+<div class="form-inline">
+    URL:
+    <input type="text" id="txt_url" class="input-xxlarge" value="webrtc://live.x.hath.top:8443/live/livestream">
+    <button class="btn btn-primary" id="btn_play">播放视频</button>
+</div>
+<video id="player" controls autoplay ></video>
+</body>
+
+<script type="text/javascript">
+    sdk = new SrsRtcPlayerAsync();
+    const player = document.getElementById('player')
+    player.srcObject = sdk.stream;
+
+    async function play(){
+        const session = await sdk.play('webrtc://live.x.hath.top:8443/live/livestream')
+        console.log('session:', session)
+        console.log('stream:', sdk.stream.getVideoTracks())
+    }
+
+    document.getElementById('btn_play').addEventListener('click', function () {
+        play()
+    })
+
+</script>
+</html>

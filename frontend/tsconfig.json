@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "importHelpers": true,
+        "isolatedModules": true,
+        "strict": true,
+        "strictPropertyInitialization": false,
+        "noEmit": true,
+        "experimentalDecorators": true,
+        "baseUrl": "./",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ]
+        }
+    }
+}
