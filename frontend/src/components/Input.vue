@@ -1,14 +1,13 @@
 <template>
-  <div id="input">
-    <div class="flex justify-between top">
-      <n-input placeholder="room" v-model:value="store.room" maxlength="16" show-count clearable>
+  <div class="mb-4">
+    <div class="flex justify-between top mb-2">
+      <n-input class="mr-2" placeholder="room" v-model:value="store.room" maxlength="16" show-count clearable>
         <template #prefix>
           <n-icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024"><path d="M946.5 505L560.1 118.8l-25.9-25.9a31.5 31.5 0 0 0-44.4 0L77.5 505a63.9 63.9 0 0 0-18.8 46c.4 35.2 29.7 63.3 64.9 63.3h42.5V940h691.8V614.3h43.4c17.1 0 33.2-6.7 45.3-18.8a63.6 63.6 0 0 0 18.7-45.3c0-17-6.7-33.1-18.8-45.2zM568 868H456V664h112v204zm217.9-325.7V868H632V640c0-22.1-17.9-40-40-40H432c-22.1 0-40 17.9-40 40v228H238.1V542.3h-96l370-369.7l23.1 23.1L882 542.3h-96.1z" fill="currentColor"></path></svg>
           </n-icon>
         </template>
       </n-input>
-      <div class="w-16"></div>
       <n-input placeholder="user" v-model:value="store.username" maxlength="16" show-count clearable>
         <template #prefix>
           <n-icon>
@@ -17,7 +16,6 @@
         </template>
       </n-input>
     </div>
-    <div class="h-4"></div>
     <n-input placeholder="webrtc" v-model:value="webrtc" clearable>
       <template #prefix>
         <n-icon>
@@ -59,12 +57,5 @@ const webrtc = computed({
 
 </script>
 <style scoped>
-#input {
-
-}
-
-.top .n-input {
-  min-width: 6rem;
-}
 
 </style>

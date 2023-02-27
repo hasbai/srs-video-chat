@@ -15,7 +15,7 @@ func onDisconnect(client *ws.Client) {
 }
 
 func onMessage(client *ws.Client, payload []byte) error {
-	var msg Message[[]byte]
+	var msg Event
 	err := json.Unmarshal(payload, &msg)
 	if err != nil {
 		return err
@@ -26,7 +26,12 @@ func onMessage(client *ws.Client, payload []byte) error {
 	case EventLeave:
 		onLeave(client)
 	case EventChat:
-		return onChat(client, msg.Data)
+		var chat Message[Chat]
+		err = json.Unmarshal(payload, &chat)
+		if err != nil {
+			return err
+		}
+		return onChat(client, chat.Data)
 	default:
 		return fmt.Errorf("unknown event %s", msg.Event)
 	}
@@ -48,12 +53,7 @@ func onLeave(client *ws.Client) {
 	client.Hub.Broadcast(message(EventLeave, client))
 }
 
-func onChat(client *ws.Client, payload []byte) error {
-	var chat Chat
-	err := json.Unmarshal(payload, &chat)
-	if err != nil {
-		return err
-	}
+func onChat(client *ws.Client, chat Chat) error {
 	chat.From = client.Name
 	if chat.To == "" {
 		client.Hub.Broadcast(message(EventChat, chat))

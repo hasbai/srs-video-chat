@@ -3,22 +3,24 @@ package handler
 import "github.com/hasbai/srs-video-chat/ws"
 
 type payload interface {
-	[]byte | *ws.Client | Chat
+	*ws.Client | Chat
 }
 
 type Message[T payload] struct {
-	Event Event `json:"event"`
-	Data  T     `json:"data"`
+	Event
+	Data T `json:"data"`
 }
 
-type Event = string
+type Event struct {
+	Event string `json:"event"`
+}
 
 const (
-	EventJoin  Event = "join"
-	EventLeave Event = "leave"
-	EventChat  Event = "chat"
+	EventJoin  = "join"
+	EventLeave = "leave"
+	EventChat  = "chat"
 )
 
-func message[T payload](event Event, data T) Message[T] {
-	return Message[T]{Event: event, Data: data}
+func message[T payload](event string, data T) Message[T] {
+	return Message[T]{Event: Event{Event: event}, Data: data}
 }
