@@ -1,26 +1,36 @@
 export class SrsRtcSignaling {
   private ws: WebSocket
+  public connected = false
 
-  constructor(public room: string, public user: string) {}
+  constructor(public room: string, public username: string) {}
 
   onmessage: (event: MessageEvent) => void
+  onclose: (event: CloseEvent) => void
 
   // The schema is ws or wss, host is ip or ip:port, display is nickname
   // of user to join the room.
-  connect() {
+  connect(): Promise<Event> {
     const url = window.location.origin.replace('http', 'ws') + '/ws'
-    this.ws = new WebSocket(url + '?room=' + this.room + '&user=' + this.user)
+    this.ws = new WebSocket(
+      url + '?room=' + this.room + '&user=' + this.username
+    )
     this.ws.onmessage = this.onmessage
+    this.ws.onclose = (e) => {
+      this.connected = false
+      console.log('websocket closed')
+      this.onclose(e)
+    }
 
     return new Promise((resolve, reject) => {
-      this.ws.onopen = function (event) {
+      this.ws.onopen = (e) => {
+        this.connected = true
         console.log('websocket connected')
-        resolve(event)
+        resolve(e)
       }
-
-      this.ws.onerror = function (event) {
-        console.log('websocket error', event)
-        reject(event)
+      this.ws.onerror = (e) => {
+        this.connected = false
+        console.log('websocket error')
+        reject(e)
       }
     })
   }

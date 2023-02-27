@@ -1,5 +1,5 @@
 <template>
-  <div class="mb-4">
+  <div>
     <div class="row">
       <n-input class="mr-2" placeholder="room" v-model:value="config.room" maxlength="16" show-count
                clearable>

@@ -75,17 +75,17 @@ watch(store.messages, async () => {
 }
 
 .scroll::-webkit-scrollbar-track {
-  background: rgb(239, 239, 239);
+  background: white;
   border-radius: 2px;
 }
 
 .scroll::-webkit-scrollbar-thumb {
-  background: #bfbfbf;
-  border-radius: 10px;
+  background: rgb(220, 220, 220);
+  border-radius: 8px;
 }
 
 .scroll::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: rgb(180, 180, 180);
 }
 
 .scroll::-webkit-scrollbar-corner {

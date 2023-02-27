@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"fmt"
 	"github.com/hasbai/srs-video-chat/ws"
 	"golang.org/x/net/websocket"
@@ -8,24 +9,17 @@ import (
 	"net/http"
 )
 
-func wsSend(conn *websocket.Conn, message string) {
-	//goland:noinspection GoUnhandledErrorResult
-	conn.Write([]byte(message))
-}
-
-func handleWS(conn *websocket.Conn) {
-	conn.PayloadType = websocket.TextFrame
-	query := conn.Request().URL.Query()
+func handshake(config *websocket.Config, req *http.Request) error {
+	query := config.Location.Query()
 	room := query.Get("room")
 	user := query.Get("user")
+
 	if room == "" || user == "" {
-		wsSend(conn, "room and user are required")
-		return
+		return errors.New("room and user are required")
 	}
 	const maxNameSize = 16
 	if len(room) > maxNameSize || len(user) > maxNameSize {
-		wsSend(conn, fmt.Sprintf("room and user must be less than %d characters", maxNameSize))
-		return
+		return fmt.Errorf("room and user must be less than %d characters", maxNameSize)
 	}
 
 	hub, ok := ws.Hubs[room]
@@ -35,10 +29,19 @@ func handleWS(conn *websocket.Conn) {
 		go hub.Run()
 	} else {
 		if hub.HasClient(user) {
-			wsSend(conn, fmt.Sprintf("user %s already exists", user))
-			return
+			return fmt.Errorf("user %s already exists", user)
 		}
 	}
+	return nil
+}
+
+func handleWS(conn *websocket.Conn) {
+	conn.PayloadType = websocket.TextFrame
+
+	query := conn.Request().URL.Query()
+	room := query.Get("room")
+	user := query.Get("user")
+	hub := ws.Hubs[room]
 
 	client := ws.NewClient(conn, hub, user)
 	client.OnMessage = onMessage
@@ -48,16 +51,17 @@ func handleWS(conn *websocket.Conn) {
 	client.Loop()
 }
 
-func init() {
-	http.Handle("/ws", websocket.Server{
-		Handler: handleWS,
-	})
-}
-
 func Serve(addr string) {
 	log.Println("HTTP listening on", addr)
 	err := http.ListenAndServe(addr, nil)
 	if err != nil {
 		log.Fatalf("Error serving http: %s", err)
 	}
+}
+
+func init() {
+	http.Handle("/ws", websocket.Server{
+		Handler: handleWS,
+		Handshake: handshake,
+	})
 }
