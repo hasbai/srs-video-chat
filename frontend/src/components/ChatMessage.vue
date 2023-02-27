@@ -18,10 +18,10 @@
 </template>
 
 <script setup lang="ts">
-import {Chat} from "@/models/chat";
+import {ChatMessage} from "@/models/chat";
 import {configStore} from "@/plugins/store";
 
-const {message} = defineProps({message: Chat})
+const {message} = defineProps({message: ChatMessage})
 const config = configStore()
 const isMe = message?.from === config.username
 

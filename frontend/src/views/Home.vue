@@ -15,6 +15,7 @@ import {NButton} from "naive-ui";
 import {configStore, mainStore} from "@/plugins/store";
 import Chat from "@/components/Chat.vue";
 import {Client} from "@/models/client";
+import {ChatMessage} from "@/models/chat";
 
 const config = configStore()
 const store = mainStore()
@@ -25,7 +26,7 @@ sig.onmessage = e => {
   const payload = JSON.parse(e.data)
   switch (payload.event) {
     case 'chat':
-      store.messages.push(payload.data)
+      store.messages.push(Object.assign(new ChatMessage(), payload.data))
       break
     case 'join':
       store.users.push(payload.data)

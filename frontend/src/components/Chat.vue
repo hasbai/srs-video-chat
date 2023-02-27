@@ -2,11 +2,11 @@
   <div class="chat mt-8">
     <div class="scroll">
       <div class="messages">
-        <ChatMessage
+        <Message
             v-for="(message, i) in store.messages"
             :key="i"
             :message="message">
-        </ChatMessage>
+        </Message>
       </div>
     </div>
     <n-input
@@ -24,8 +24,8 @@
 import {NInput} from "naive-ui";
 import {mainStore} from "@/plugins/store";
 import {nextTick, ref, watch} from "vue";
-import {Chat} from "@/models/chat";
-import ChatMessage from "@/components/ChatMessage.vue";
+import {ChatMessage} from "@/models/chat";
+import Message from "@/components/ChatMessage.vue";
 
 const store = mainStore()
 
@@ -41,7 +41,7 @@ const sendMessage = () => {
   }
   store.sig.send({
     event: 'chat',
-    data: new Chat(content.value)
+    data: new ChatMessage(content.value)
   })
   content.value = ''
 }
