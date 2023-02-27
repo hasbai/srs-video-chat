@@ -1,6 +1,6 @@
 <template>
   <main id="main">
-    <Input></Input>
+    <Config></Config>
     <n-button type="success" @click="connectWS">Connect</n-button>
     <Chat></Chat>
   </main>
@@ -10,7 +10,7 @@
 <script setup lang="ts">
 import {onMounted} from "vue"
 import {SrsRtcSignaling} from "@/websocket"
-import Input from "@/components/Input.vue";
+import Config from "@/components/Config.vue";
 import {NButton} from "naive-ui";
 import {configStore, mainStore} from "@/plugins/store";
 import Chat from "@/components/Chat.vue";

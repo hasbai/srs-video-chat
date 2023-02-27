@@ -10,7 +10,19 @@ export const configStore = defineStore('config', {
       room: '',
     }
   },
-  persist: true,
+  actions: {
+    save() {
+      localStorage.setItem('config', JSON.stringify(this.$state))
+      console.log('config saved')
+    },
+    load() {
+      const config = localStorage.getItem('config')
+      if (config) {
+        this.$patch(JSON.parse(config))
+      }
+      console.log('config loaded')
+    },
+  },
 })
 
 export const mainStore = defineStore('main', {
