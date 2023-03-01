@@ -42,6 +42,7 @@ func handleWS(conn *websocket.Conn) {
 	if err != nil {
 		_, _ = conn.Write([]byte(err.Error()))
 		_ = conn.Close()
+		return
 	} else {
 		_, _ = conn.Write([]byte("OK"))
 	}
