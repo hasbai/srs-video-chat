@@ -8,7 +8,7 @@ import (
 )
 
 type Client struct {
-	Name         string `json:"Name"`
+	Name         string `json:"name"`
 	Hub          *Hub   `json:"-"`
 	conn         *websocket.Conn
 	send         chan []byte
