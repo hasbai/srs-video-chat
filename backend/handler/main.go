@@ -9,17 +9,17 @@ import (
 	"net/http"
 )
 
-func handshake(config *websocket.Config, req *http.Request) error {
-	query := config.Location.Query()
+func handshake(conn *websocket.Conn) (*ws.Client, error) {
+	query := conn.Request().URL.Query()
 	room := query.Get("room")
 	user := query.Get("user")
 
 	if room == "" || user == "" {
-		return errors.New("room and user are required")
+		return nil, errors.New("room and user are required")
 	}
 	const maxNameSize = 16
 	if len(room) > maxNameSize || len(user) > maxNameSize {
-		return fmt.Errorf("room and user must be less than %d characters", maxNameSize)
+		return nil, fmt.Errorf("room and user must be less than %d characters", maxNameSize)
 	}
 
 	hub, ok := ws.Hubs[room]
@@ -29,21 +29,23 @@ func handshake(config *websocket.Config, req *http.Request) error {
 		go hub.Run()
 	} else {
 		if hub.HasClient(user) {
-			return fmt.Errorf("user %s already exists", user)
+			return nil, fmt.Errorf("user %s already exists", user)
 		}
 	}
-	return nil
+	return ws.NewClient(conn, hub, user), nil
 }
 
 func handleWS(conn *websocket.Conn) {
 	conn.PayloadType = websocket.TextFrame
 
-	query := conn.Request().URL.Query()
-	room := query.Get("room")
-	user := query.Get("user")
-	hub := ws.Hubs[room]
+	client, err := handshake(conn)
+	if err != nil {
+		_, _ = conn.Write([]byte(err.Error()))
+		_ = conn.Close()
+	} else {
+		_, _ = conn.Write([]byte("OK"))
+	}
 
-	client := ws.NewClient(conn, hub, user)
 	client.OnMessage = onMessage
 	client.OnConnect = onConnect
 	client.OnDisconnect = onDisconnect
@@ -62,6 +64,5 @@ func Serve(addr string) {
 func init() {
 	http.Handle("/ws", websocket.Server{
 		Handler: handleWS,
-		Handshake: handshake,
 	})
 }

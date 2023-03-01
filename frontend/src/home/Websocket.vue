@@ -1,6 +1,6 @@
 <template>
-  <n-button :type="connected ? 'error' : 'success'" @click="onClick">
-    {{ connected ? 'Disconnect' : 'Connect' }}
+  <n-button :type="buttonType" :disabled="buttonDisabled" @click="onClick">
+    {{ buttonText }}
   </n-button>
 </template>
 
@@ -8,7 +8,7 @@
 
 import {NButton, useMessage} from "naive-ui";
 import {configStore, mainStore} from "@/plugins/store";
-import {ref} from "vue";
+import {computed, ref} from "vue";
 import {ChatMessage} from "@/models/chat";
 import {Client} from "@/models/client";
 import Websocket from "@/home/Websocket.vue";
@@ -19,15 +19,57 @@ const config = configStore()
 const store = mainStore()
 
 let ws: Websocket
-let connected = ref(false)
 
-function connect(): Promise<Event> {
+const CLOSED = 0
+const CONNECTING = 1
+const CONNECTED = 2
+let status = ref(CLOSED)
+
+const buttonType = computed(() => {
+  switch (status.value) {
+    case CLOSED:
+      return 'success'
+    case CONNECTING:
+      return 'info'
+    case CONNECTED:
+      return 'error'
+  }
+})
+const buttonDisabled = computed(() => {
+  return status.value === CONNECTING
+})
+const buttonText = computed(() => {
+  switch (status.value) {
+    case CLOSED:
+      return 'Connect'
+    case CONNECTING:
+      return 'Connecting'
+    case CONNECTED:
+      return 'Disconnect'
+  }
+})
+
+function connect() {
+  status.value = CONNECTING
+
   const url = window.location.origin.replace('http', 'ws') + '/ws'
   ws = new WebSocket(
       url + '?room=' + config.room + '&user=' + config.username
   )
 
   ws.onmessage = (e: MessageEvent) => {
+    if (status.value === CONNECTING) {
+      if (e.data === 'OK') {
+        status.value = CONNECTED
+        console.log('websocket connected')
+        message.success('websocket connected')
+      } else {
+        status.value = CLOSED
+        console.log('websocket connect failed: ' + e.data)
+        message.error('websocket connect failed: ' + e.data)
+      }
+      return
+    }
     let payload
     try {
       payload = JSON.parse(e.data)
@@ -48,29 +90,25 @@ function connect(): Promise<Event> {
         break
     }
   }
+
   ws.onclose = (e: CloseEvent) => {
-    if (!connected.value) return
-    connected.value = false
+    if (status.value === CLOSED) return
+    status.value = CLOSED
     console.log('websocket closed')
     message.warning('websocket closed')
   }
 
-  store.sig = ws
+  ws.onopen = (e: Event) => {
+    status.value = CONNECTING
+  }
 
-  return new Promise((resolve, reject) => {
-    ws.onopen = (e: Event) => {
-      connected.value = true
-      console.log('websocket connected')
-      message.success('websocket connected')
-      resolve(e)
-    }
-    ws.onerror = (e: Event) => {
-      connected.value = false
-      console.log('websocket error')
-      message.error('websocket error')
-      reject(e)
-    }
-  })
+  ws.onerror = (e: Event) => {
+    status.value = CLOSED
+    console.log('websocket connect failed: unknown')
+    message.error('websocket connect failed: unknown')
+  }
+
+  store.sig = ws
 }
 
 function close() {
@@ -80,23 +118,18 @@ function close() {
   }
 }
 
-async function connectWS() {
-  try {
-    await connect()
-  } catch (e) {
-    message.error('websocket connect failed')
-  }
-}
-
 function onClick() {
-  if (connected.value) {
-    close()
-  } else {
-    connectWS()
+  switch (status.value) {
+    case CLOSED:
+      connect()
+      break
+    case CONNECTED:
+      close()
+      break
   }
 }
 
-connectWS()
+connect()
 
 </script>
 
