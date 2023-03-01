@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ChatMessage } from '@/models/chat'
-import { SrsRtcSignaling } from '@/websocket'
 import { Client } from '@/models/client'
 
 export const configStore = defineStore('config', {
@@ -30,7 +29,7 @@ export const mainStore = defineStore('main', {
     return {
       messages: Array<ChatMessage>(),
       users: Array<Client>(),
-      sig: new SrsRtcSignaling('', ''),
+      sig: null as any as WebSocket,
     }
   },
 })

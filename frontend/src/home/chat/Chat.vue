@@ -25,7 +25,7 @@ import {NInput} from "naive-ui";
 import {mainStore} from "@/plugins/store";
 import {nextTick, ref, watch} from "vue";
 import {ChatMessage} from "@/models/chat";
-import Message from "@/components/ChatMessage.vue";
+import Message from "@/home/chat/ChatMessage.vue";
 
 const store = mainStore()
 
@@ -39,10 +39,10 @@ const sendMessage = () => {
   } else {
     status.value = ''
   }
-  store.sig.send({
+  store.sig.send(JSON.stringify({
     event: 'chat',
     data: new ChatMessage(content.value)
-  })
+  }))
   content.value = ''
 }
 
