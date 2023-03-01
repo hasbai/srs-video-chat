@@ -9,13 +9,13 @@ import (
 
 type Client struct {
 	Name         string `json:"Name"`
-	Hub          *Hub
+	Hub          *Hub   `json:"-"`
 	conn         *websocket.Conn
 	send         chan []byte
 	close        chan bool
-	OnConnect    func(*Client)
-	OnDisconnect func(*Client)
-	OnMessage    func(c *Client, data []byte) error
+	OnConnect    func(*Client)                      `json:"-"`
+	OnDisconnect func(*Client)                      `json:"-"`
+	OnMessage    func(c *Client, data []byte) error `json:"-"`
 }
 
 func NewClient(conn *websocket.Conn, hub *Hub, name string) *Client {
