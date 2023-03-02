@@ -58,8 +58,7 @@ watch(store.messages, async () => {
 .chat {
   width: 75%;
   min-width: 200px;
-  height: 0;
-  flex: 1;
+  min-height: 200px;
   display: flex;
   flex-direction: column;
 }

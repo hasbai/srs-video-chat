@@ -21,11 +21,8 @@ const store = mainStore();
 
 <style scoped>
 .players {
-  max-width: 100%;
-  max-height: 60%;
 }
 
 .players > * {
-  margin: 0.25rem;
 }
 </style>

@@ -15,22 +15,14 @@ html {
     flex-direction: column;
 }
 
-header {
-    width: 100%;
-    height: 3rem;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-}
-
 main {
     display: flex;
     flex: 1;
     flex-direction: column;
     align-items: center;
     max-width: 1080px;
-    margin: 2rem auto;
-    height: 0;  /* prevents overflow */
+    margin: 0.5rem auto 2rem;
+    height: 0; /* prevents overflow */
 }
 
 footer {

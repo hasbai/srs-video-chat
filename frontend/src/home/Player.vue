@@ -87,8 +87,9 @@ onMounted(async () => {
 
 </script>
 
-<style scoped>
+<style lang="css" scoped>
 .container {
+  margin: 0.25rem;
   border: grey 1px solid;
 }
 
@@ -98,6 +99,6 @@ onMounted(async () => {
 
 video {
   max-width: 100%;
-  max-height: 100%;
+  max-height: 480px;
 }
 </style>
