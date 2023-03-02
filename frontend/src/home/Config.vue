@@ -27,7 +27,7 @@
       </n-input>
     </div>
     <div class="row">
-      <n-input class="mr-2" placeholder="webrtc" v-model:value="webrtc" clearable>
+      <n-input class="mr-2" placeholder="webrtc" v-model:value="config.webrtcURL" clearable>
         <template #prefix>
           <n-icon>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -58,29 +58,13 @@ import {NButton, NIcon, NInput, useMessage} from "naive-ui"
 import {randomHex} from '@/utils'
 import {useRoute} from 'vue-router'
 import {configStore} from "@/plugins/store";
-import {computed, ref} from "vue";
 
 const route = useRoute()
 const config = configStore()
 
 config.room = route.params.room as string || config.room || randomHex()
 config.username = config.username || randomHex()
-
-let host = ref(window.location.host)
-const webrtc = computed({
-  get() {
-    return `webrtc://${host.value}/${config.room}/${config.username}`
-  },
-  set(value) {
-    const values = value.split('/')
-    if (values.length != 5) {
-      return
-    }
-    host.value = values[values.length - 3]
-    config.room = values[values.length - 2]
-    config.username = values[values.length - 1]
-  }
-})
+config.webrtcURL = config.webrtcURL || `webrtc://${window.location.host}`
 
 const message = useMessage()
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="chat mt-8">
+  <div class="chat">
     <div class="scroll">
       <div class="messages">
         <Message

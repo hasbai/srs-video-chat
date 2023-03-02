@@ -83,7 +83,7 @@ const isMe = message?.from === config.username
   border-radius: 0 0 50% 0;
 }
 
-.name {
+.toolbar {
   margin-left: 1.25rem;
 }
 

@@ -10,7 +10,6 @@ import {NButton, useMessage} from "naive-ui";
 import {configStore, mainStore} from "@/plugins/store";
 import {computed, ref} from "vue";
 import {ChatMessage} from "@/models/chat";
-import {Client} from "@/models/client";
 import Websocket from "@/home/Websocket.vue";
 
 const message = useMessage()
@@ -60,13 +59,9 @@ function connect() {
   ws.onmessage = (e: MessageEvent) => {
     if (status.value === CONNECTING) {
       if (e.data === 'OK') {
-        status.value = CONNECTED
-        console.log('websocket connected')
-        message.success('websocket connected')
+        onconnect()
       } else {
-        status.value = CLOSED
-        console.log('websocket connect failed: ' + e.data)
-        message.error('websocket connect failed: ' + e.data)
+        onclose('websocket connect failed: ' + e.data)
       }
       return
     }
@@ -82,20 +77,16 @@ function connect() {
         store.messages.push(Object.assign(new ChatMessage(), payload.data))
         break
       case 'join':
-        store.users.push(payload.data)
+        store.joinClient(payload.data)
         break
       case 'leave':
-        const client = payload.data as Client
-        store.users = store.users.filter(u => u.name !== client.name)
+        store.leaveClient(payload.data.name)
         break
     }
   }
 
   ws.onclose = (e: CloseEvent) => {
-    if (status.value === CLOSED) return
-    status.value = CLOSED
-    console.log('websocket closed')
-    message.warning('websocket closed')
+    onclose('websocket closed')
   }
 
   ws.onopen = (e: Event) => {
@@ -109,6 +100,23 @@ function connect() {
   }
 
   store.sig = ws
+}
+
+function onclose(msg = '') {
+  if (status.value === CLOSED) return
+  status.value = CLOSED
+  if (msg) {
+    console.log(msg)
+    message.error(msg)
+  }
+  store.clients = []
+}
+
+function onconnect() {
+  status.value = CONNECTED
+  console.log('websocket connected')
+  message.success('websocket connected')
+  store.joinClient({name: config.username})
 }
 
 function close() {

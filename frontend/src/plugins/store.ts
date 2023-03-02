@@ -7,6 +7,7 @@ export const configStore = defineStore('config', {
     return {
       username: '',
       room: '',
+      webrtcURL: '',
     }
   },
   actions: {
@@ -28,8 +29,16 @@ export const mainStore = defineStore('main', {
   state: () => {
     return {
       messages: Array<ChatMessage>(),
-      users: Array<Client>(),
+      clients: Array<Client>(),
       sig: null as any as WebSocket,
     }
+  },
+  actions: {
+    joinClient(client: object) {
+      this.clients.push(client as Client)
+    },
+    leaveClient(name: string) {
+      this.clients = this.clients.filter((c) => c.name !== name)
+    },
   },
 })
